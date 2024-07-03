@@ -12,3 +12,4 @@ engine = create_engine(ur_s)
 
 def create_tables():
     Base.metadata.create_all(bind=engine)
+    # Base.metadata.drop_all(bind=engine)

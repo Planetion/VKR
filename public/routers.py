@@ -15,7 +15,7 @@ def get_session():
             session.close()
 
 users_router = APIRouter(prefix='/api/users', tags=[Tags.user])
-level_router = APIRouter(prefix='/api/levels', tags=[Tags.level])
+# level_router = APIRouter(prefix='/api/levels', tags=[Tags.level])
 
 def coder_passwd(cod: str):
     return cod*2
@@ -104,84 +104,84 @@ def delete_user(id: int, db: Session = Depends(get_session)):
     return JSONResponse(content={'message': f'Пользователь удалён {id}'})
 
 
-#Поиск уровня
-@level_router.get("/{id}", response_model= Main_Level, tags=[Tags.level])
-def get_level(id: int, db: Session = Depends(get_session)):
-    level = db.query(Level).filter(Level.id == id).first()
-
-    if level == None:
-        return JSONResponse(status_code=404, content={"message": "Уровень не найден"})
-    else:
-        return level
-
-#Вывод всех уровней
-@level_router.get("/",response_model = list[Main_Level] | None, tags=[Tags.level])
-def get_level_db(db: Session = Depends(get_session)):
-    level = db.query(Level).all()
-    if level == None:
-        return JSONResponse(status_code=404, content={"message": " Уровни не найдены"})
-    return level
-
-#Создание уровня
-@level_router.post("/", response_model= Main_Level, status_code=status.HTTP_201_CREATED, tags=[Tags.level])
-def create_level(item: Annotated[Main_Level, Body(embed=True)],
-                db: Session = Depends(get_session)):
-    try:
-        level = Level(size=item.size, body=item.body)
-        if level is None:
-            raise HTTPException(status_code=404, detail="Объект не определён")
-        db.add(level)
-        db.commit()
-        db.refresh(level)
-        return level
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Произошла ошибка при добавлении объекта {user}")
-
-#Изменение уровня
-@level_router.put("/{id}", response_model = Main_Level, tags=[Tags.level])
-def edit_level(id: int, item: Annotated[Main_Level, Body(embed=True)],
-               db: Session = Depends(get_session)):
-    level = db.query(Level).filter(Level.id == id).first()
-
-    if level == None:
-        return JSONResponse(status_code=404, content={"message":"Уровень не найден"})
-    level.size=item.size
-    level.body=item.body
-    try:
-        db.commit()
-        db.refresh(level)
-    except HTTPException:
-        return JSONResponse(status_code=404, content={"message": ""})
-    return level
-
-@level_router.patch("/{id}", response_model = Main_Level, tags=[Tags.level])
-def update_level(id: int, item: Annotated[Main_Level, Body(embed=True)],
-                db: Session = Depends(get_session)):
-    level = db.query(Level).filter(Level.id == id).first()
-
-    if level== None:
-        return JSONResponse(status_code=404, content={"message":"Уровень не найден"})
-    if item.size != 0:
-        level.size = item.size
-    if item.body != "string":
-        level.body= item.body
-    try:
-        db.commit()
-        db.refresh(level)
-    except HTTPException:
-        return JSONResponse(status_code=404, content={"message": ""})
-    return level
-
-#Удаление уровня
-@level_router.delete("/{id}", response_class=JSONResponse, tags=[Tags.level])
-def delete_level(id: int, db: Session = Depends(get_session)):
-    level = db.query(Level).filter(Level.id == id).first()
-
-    if level == None:
-        return JSONResponse(status_code=404, content={"message": "Уровень не найден"})
-    try:
-        db.delete(level)
-        db.commit()
-    except HTTPException:
-        return JSONResponse(content={'message': f'Ошибка'})
-    return JSONResponse(content={'message': f'Уровень удалён {id}'})
+# #Поиск уровня
+# @level_router.get("/{id}", response_model= Main_Level, tags=[Tags.level])
+# def get_level(id: int, db: Session = Depends(get_session)):
+#     level = db.query(Level).filter(Level.id == id).first()
+#
+#     if level == None:
+#         return JSONResponse(status_code=404, content={"message": "Уровень не найден"})
+#     else:
+#         return level
+#
+# #Вывод всех уровней
+# @level_router.get("/",response_model = list[Main_Level] | None, tags=[Tags.level])
+# def get_level_db(db: Session = Depends(get_session)):
+#     level = db.query(Level).all()
+#     if level == None:
+#         return JSONResponse(status_code=404, content={"message": " Уровни не найдены"})
+#     return level
+#
+# #Создание уровня
+# @level_router.post("/", response_model= Main_Level, status_code=status.HTTP_201_CREATED, tags=[Tags.level])
+# def create_level(item: Annotated[Main_Level, Body(embed=True)],
+#                 db: Session = Depends(get_session)):
+#     try:
+#         level = Level(size=item.size, body=item.body)
+#         if level is None:
+#             raise HTTPException(status_code=404, detail="Объект не определён")
+#         db.add(level)
+#         db.commit()
+#         db.refresh(level)
+#         return level
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Произошла ошибка при добавлении объекта {level}")
+#
+# #Изменение уровня
+# @level_router.put("/{id}", response_model = Main_Level, tags=[Tags.level])
+# def edit_level(id: int, item: Annotated[Main_Level, Body(embed=True)],
+#                db: Session = Depends(get_session)):
+#     level = db.query(Level).filter(Level.id == id).first()
+#
+#     if level == None:
+#         return JSONResponse(status_code=404, content={"message":"Уровень не найден"})
+#     level.size=item.size
+#     level.body=item.body
+#     try:
+#         db.commit()
+#         db.refresh(level)
+#     except HTTPException:
+#         return JSONResponse(status_code=404, content={"message": ""})
+#     return level
+#
+# @level_router.patch("/{id}", response_model = Main_Level, tags=[Tags.level])
+# def update_level(id: int, item: Annotated[Main_Level, Body(embed=True)],
+#                 db: Session = Depends(get_session)):
+#     level = db.query(Level).filter(Level.id == id).first()
+#
+#     if level== None:
+#         return JSONResponse(status_code=404, content={"message":"Уровень не найден"})
+#     if item.size != 0:
+#         level.size = item.size
+#     if item.body != "string":
+#         level.body = item.body
+#     try:
+#         db.commit()
+#         db.refresh(level)
+#     except HTTPException:
+#         return JSONResponse(status_code=404, content={"message": ""})
+#     return level
+#
+# #Удаление уровня
+# @level_router.delete("/{id}", response_class=JSONResponse, tags=[Tags.level])
+# def delete_level(id: int, db: Session = Depends(get_session)):
+#     level = db.query(Level).filter(Level.id == id).first()
+#
+#     if level == None:
+#         return JSONResponse(status_code=404, content={"message": "Уровень не найден"})
+#     try:
+#         db.delete(level)
+#         db.commit()
+#     except HTTPException:
+#         return JSONResponse(content={'message': f'Ошибка'})
+#     return JSONResponse(content={'message': f'Уровень удалён {id}'})
